@@ -92,6 +92,11 @@ const checkRequest = ({ terminalId }) => {
         const postargs = getArgs(REQUEST.REQUEST);
   
         const posResult = await DICTIONARY[REQUEST.FUNC](...postargs);
+        
+        if (!posResult) {
+          console.warn('El método del POS no arrojó resultados');
+          return;
+        }
   
         consola.info("___POS_RESULT___", posResult);
   

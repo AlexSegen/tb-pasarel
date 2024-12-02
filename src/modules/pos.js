@@ -1,6 +1,7 @@
 import Transbank from "transbank-pos-sdk";
 import { POSIntegrado as FakePOS } from './fake-transbank-pos-sdk.js'
 import { CONFIG } from "../config.js";
+import { Log } from './logger.js';
 
 let POS;
 // Pos Instance
@@ -18,7 +19,14 @@ const DICTIONARY = {
     "0500": () => POS.closeDay(), // TRANSACCIÓN DE CIERRE
     "0700": () => POS.getTotals(), // DETALLE DE VENTAS
     "0300": () => POS.changeToNormalMode(), // CAMBIO DE MODALIDAD A POS NORMAL
-    "0260": (printOnPos) => POS.salesDetail(printOnPos),  // TRANSACCIÓN TOTALES
+    "0260": (printOnPos) => {
+        try {
+            return POS.salesDetail(printOnPos)
+        } catch (err) {
+            Log(err.message, 'salesDetail');
+         return null;
+        }
+    },  // TRANSACCIÓN TOTALES
     "0200": (amount, ticket, sendStatus, callback) => {
         console.log(
             `amount: ${amount}, ticket: ${ticket}, sendStatus: ${sendStatus}, callback: ${callback}`
