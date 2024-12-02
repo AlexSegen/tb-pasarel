@@ -2,6 +2,7 @@ import Transbank from "transbank-pos-sdk";
 import { POSIntegrado as FakePOS } from './fake-transbank-pos-sdk.js'
 import { CONFIG } from "../config.js";
 import { Log } from './logger.js';
+import consola from 'consola';
 
 let POS;
 // Pos Instance
@@ -24,6 +25,7 @@ const DICTIONARY = {
             return POS.salesDetail(printOnPos)
         } catch (err) {
             Log(err.message, 'salesDetail');
+            consola.error('Ocurrió un error en el método [salesDetail]', err.message);
          return null;
         }
     },  // TRANSACCIÓN TOTALES
