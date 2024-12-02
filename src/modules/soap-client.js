@@ -27,92 +27,97 @@ const checkRequest = ({ terminalId }) => {
 
   const options = {};
 
-  soap.createClient(url, options, (err, client) => {
-    if (err) {
-      console.error("Error creando cliente SOAP:", err);
-      Log(err.message, 'createClient');
-      return;
-    }
-
-    client.setSecurity(new soap.BasicAuthSecurity(SOAP_USER, SOAP_PASSWORD));
-
-    function processData(
-      posResult,
-      { WERKS, VKORG, UNAME, POSID, DATUM, UZEIT, FUNC }
-    ) {
-      const args = {
-        RESPONSE: {
-          item: handlePOSResult(
-            { WERKS, VKORG, UNAME, POSID, DATUM, UZEIT, FUNC },
-            posResult
-          ),
-        },
-      };
-
-      console.log("ZRFC_POS_TBK_RESPONSE args", args.RESPONSE);
-
-      client.ZRFC_POS_TBK_RESPONSE(args, async (err, _) => {
-        try {
-          
-          if (err) {
-            consola.error("Error en ZRFC_POS_TBK_RESPONSE:", err);
+  try {
+    soap.createClient(url, options, (err, client) => {
+      if (err) {
+        console.error("Error creando cliente SOAP:", err);
+        Log(err.message, 'createClient');
+        return;
+      }
+  
+      client.setSecurity(new soap.BasicAuthSecurity(SOAP_USER, SOAP_PASSWORD));
+  
+      function processData(
+        posResult,
+        { WERKS, VKORG, UNAME, POSID, DATUM, UZEIT, FUNC }
+      ) {
+        const args = {
+          RESPONSE: {
+            item: handlePOSResult(
+              { WERKS, VKORG, UNAME, POSID, DATUM, UZEIT, FUNC },
+              posResult
+            ),
+          },
+        };
+  
+        console.log("ZRFC_POS_TBK_RESPONSE args", args.RESPONSE);
+  
+        client.ZRFC_POS_TBK_RESPONSE(args, async (err, _) => {
+          try {
+            
+            if (err) {
+              consola.error("Error en ZRFC_POS_TBK_RESPONSE:", err);
+              Log(err.message, 'ZRFC_POS_TBK_RESPONSE');
+              return;
+            }
+            consola.success("ZRFC_POS_TBK_RESPONSE exitoso");
+  
+            return;
+  
+          } catch (err) {
+            consola.error('Ocurrió un error durante la ejecución de ZRFC_POS_TBK_RESPONSE', error);
             Log(err.message, 'ZRFC_POS_TBK_RESPONSE');
+            return
+          }
+        });
+      }
+  
+      client.ZRFC_POS_TBK_REQUEST(requestArgs, async (err, result) => {
+        try {
+          if (err) {
+            consola.error("Error en ZRFC_POS_TBK_REQUEST:", err);
+            Log(err.message, 'ZRFC_POS_TBK_REQUEST');
             return;
           }
-          consola.success("ZRFC_POS_TBK_RESPONSE exitoso");
-
+          consola.success("ZRFC_POS_TBK_REQUEST exitoso", result);
+    
+          const { REQUEST, SUBRC } = result;
+    
+          if (SUBRC !== 0) return;
+    
+          if (!DICTIONARY[REQUEST.FUNC]) {
+            consola.error("Código inválido: " + REQUEST.FUNC, err);
+            return;
+          }
+    
+          const postargs = getArgs(REQUEST.REQUEST);
+    
+          const posResult = await DICTIONARY[REQUEST.FUNC](...postargs);
+          
+          if (!posResult) {
+            console.warn('El método del POS no arrojó resultados');
+            return;
+          }
+    
+          consola.info("___POS_RESULT___", posResult);
+    
+          processData(posResult, REQUEST);
+    
           return;
-
-        } catch (err) {
-          consola.error('Ocurrió un error durante la ejecución de ZRFC_POS_TBK_RESPONSE', error);
-          Log(err.message, 'ZRFC_POS_TBK_RESPONSE');
-          return
-        }
-      });
-    }
-
-    client.ZRFC_POS_TBK_REQUEST(requestArgs, async (err, result) => {
-      try {
-        if (err) {
-          consola.error("Error en ZRFC_POS_TBK_REQUEST:", err);
+          
+        } catch (error) {
+          consola.error('Ocurrió un error durante la ejecución de ZRFC_POS_TBK_REQUEST', error);
           Log(err.message, 'ZRFC_POS_TBK_REQUEST');
           return;
         }
-        consola.success("ZRFC_POS_TBK_REQUEST exitoso", result);
-  
-        const { REQUEST, SUBRC } = result;
-  
-        if (SUBRC !== 0) return;
-  
-        if (!DICTIONARY[REQUEST.FUNC]) {
-          consola.error("Código inválido: " + REQUEST.FUNC, err);
-          return;
-        }
-  
-        const postargs = getArgs(REQUEST.REQUEST);
-  
-        const posResult = await DICTIONARY[REQUEST.FUNC](...postargs);
-        
-        if (!posResult) {
-          console.warn('El método del POS no arrojó resultados');
-          return;
-        }
-  
-        consola.info("___POS_RESULT___", posResult);
-  
-        processData(posResult, REQUEST);
-  
-        return;
-        
-      } catch (error) {
-        consola.error('Ocurrió un error durante la ejecución de ZRFC_POS_TBK_REQUEST', error);
-        Log(err.message, 'ZRFC_POS_TBK_REQUEST');
-        return;
-      }
+      });
     });
-  });
+    return;
 
-  return;
+  } catch (error) {
+    consola.error('Error en [checkRequest]', error);
+    return;
+  }
 };
 
 export { checkRequest };
