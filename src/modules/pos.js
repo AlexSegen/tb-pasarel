@@ -33,7 +33,12 @@ const DICTIONARY = {
             `printOnPos: ${printOnPos}`
         )
         try {
-            return POS.salesDetail(printOnPos);
+           
+           if (POS.waiting && printOnPos === '0') {
+            POS.ackCallback();
+           };
+            
+           return POS.salesDetail(printOnPos);
         } catch (err) {
             Log(err.message, 'salesDetail');
 
