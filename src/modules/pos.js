@@ -12,6 +12,14 @@ if (CONFIG.isDev) {
     POS = new Transbank.POSIntegrado();
 };
 
+class TransbankSalesDetailException extends Error {
+    constructor(message) {
+      super(message);
+      this.name = "ValidationError"; 
+    }
+}
+  
+
 // Dictionary
 const DICTIONARY = {
     "0800": () => POS.loadKeys(), // TRANSACCIÓN CARGA DE LLAVES
@@ -21,16 +29,25 @@ const DICTIONARY = {
     "0700": () => POS.getTotals(), // DETALLE DE VENTAS
     "0300": () => POS.changeToNormalMode(), // CAMBIO DE MODALIDAD A POS NORMAL
     "0260": (printOnPos) => {
+        consola.info(
+            `printOnPos: ${printOnPos}`
+        )
         try {
-            return POS.salesDetail(printOnPos)
+            return POS.salesDetail(printOnPos);
         } catch (err) {
             Log(err.message, 'salesDetail');
-            consola.error('Ocurrió un error en el método [salesDetail]', err.message);
-         return null;
+
+            if (err instanceof TransbankSalesDetailException) {
+                consola.error('Ocurrió un error en el método [salesDetail] de tipo [TransbankSalesDetailException]: ', err.message);
+                return null
+            } else {
+                consola.error('Ocurrió un error en el método [salesDetail]', err.message);
+                return null;
+            }
         }
     },  // TRANSACCIÓN TOTALES
     "0200": (amount, ticket, sendStatus, callback) => {
-        console.log(
+        consola.info(
             `amount: ${amount}, ticket: ${ticket}, sendStatus: ${sendStatus}, callback: ${callback}`
         )
         return POS.sale(amount, ticket, sendStatus, callback)

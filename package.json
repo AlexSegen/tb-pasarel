@@ -6,10 +6,11 @@
   "module": "dist/module.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "parcel watch",
+    "watch": "cross-env NODE_ENV=MOCKS parcel watch",
     "build": "parcel build",
     "build:dev": "cross-env NODE_ENV=MOCKS parcel build",
-    "start": "node ./dist/main.js"
+    "start": "npm run build && node ./dist/main.js",
+    "start:dev": "npm run build:dev && node ./dist/main.js"
   },
   "keywords": [],
   "author": "",

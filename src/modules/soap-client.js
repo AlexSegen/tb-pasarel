@@ -105,8 +105,8 @@ const checkRequest = ({ terminalId }) => {
     
           return;
           
-        } catch (error) {
-          consola.error('Ocurrió un error durante la ejecución de ZRFC_POS_TBK_REQUEST', error);
+        } catch (err) {
+          consola.error('Ocurrió un error durante la ejecución de ZRFC_POS_TBK_REQUEST', err);
           Log(err.message, 'ZRFC_POS_TBK_REQUEST');
           return;
         }
@@ -114,8 +114,8 @@ const checkRequest = ({ terminalId }) => {
     });
     return;
 
-  } catch (error) {
-    consola.error('Error en [checkRequest]', error);
+  } catch (err) {
+    consola.error('Error en [checkRequest]', err);
     return;
   }
 };
