@@ -79,9 +79,9 @@ const checkRequest = ({ terminalId }) => {
             Log(err.message, 'ZRFC_POS_TBK_REQUEST');
             return;
           }
-          consola.success("ZRFC_POS_TBK_REQUEST exitoso", result);
+          consola.success("ZRFC_POS_TBK_REQUEST exitoso", await result);
     
-          const { REQUEST, SUBRC } = result;
+          const { REQUEST, SUBRC } = await result;
     
           if (SUBRC !== 0) return;
     

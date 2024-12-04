@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { EMPTY_SALES_DETAILS } from './constants.js';
 
 export const getArgs = (value) => {
@@ -84,3 +85,15 @@ export const handlePOSResult = (
 
   return ITEM;
 };
+
+
+export const getMock = (f, m) => `./__mocks__/${m}/${f}.json`
+
+export async function getMockData(f, m) {
+  try {
+      const data = JSON.parse(await readFile(getMock(f, m), 'utf8'));
+      return data;
+    } catch (err) {
+      console.error(`Error reading JSON file: ${err}`);
+    }
+}

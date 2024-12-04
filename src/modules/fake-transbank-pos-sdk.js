@@ -1,17 +1,4 @@
-//import getLastSaleMock from '../../__mocks__/pos/getLastSale.json' with {type: "json"}; 
-import { readFile } from 'node:fs/promises';
-
-const getMock = (f) => `./__mocks__/pos/${f}.json`
-
-
-async function getData(f) {
-    try {
-        const data = JSON.parse(await readFile(getMock(f), 'utf8'));
-        return data;
-      } catch (err) {
-        console.error(`Error reading JSON file: ${err}`);
-      }
-  }
+import { getMockData } from '../helpers/utils.js'
 
 export class POSIntegrado {
     connected;
@@ -53,7 +40,7 @@ export class POSIntegrado {
     }
 
     getLastSale() {
-        return getData('getLastSale');
+        return getMockData('getLastSale', 'pos');
     }
 
     getTotals() {
@@ -62,6 +49,6 @@ export class POSIntegrado {
 
     salesDetail(printOnPos) {
         console.log(`[salesDetail] params - printOnPos: ${printOnPos}`);
-        return getData('salesDetail');
+        return getMockData('salesDetail', 'pos');
     }
 }
