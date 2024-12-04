@@ -34,7 +34,11 @@ const DICTIONARY = {
         POS.waiting = false;
       }
 
-      return POS.salesDetail(printOnPos);
+      const posResult = POS.salesDetail(printOnPos);
+
+      POS.waiting = false;
+
+      return posResult;
     } catch (err) {
       Log(err.message, "salesDetail");
 
@@ -59,7 +63,7 @@ const DICTIONARY = {
     );
     return POS.sale(amount, ticket, sendStatus, callback);
   }, // TRANSACCIONES DE VENTA
-  1200: (operationId) => POS.refund(operationId), // TRANSACCIÓN ANULACIÓN VENTA
+  "1200": (operationId) => POS.refund(operationId), // TRANSACCIÓN ANULACIÓN VENTA
 };
 
 export { POS, DICTIONARY };
