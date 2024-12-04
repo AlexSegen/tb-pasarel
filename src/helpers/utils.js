@@ -1,3 +1,5 @@
+import { EMPTY_SALES_DETAILS } from './constants.js';
+
 export const getArgs = (value) => {
   const args = value.split("|");
   args.splice(0, 1);
@@ -5,10 +7,14 @@ export const getArgs = (value) => {
 };
 
 export const mapvalues = (obj) => {
+  
+  if (!obj) return null;
+
   let values = "";
   Object.keys(obj).forEach((key) => {
     values = values.toString().concat(`${obj[key]}|`);
   });
+
   return values;
 };
 
@@ -41,6 +47,21 @@ export const handlePOSResult = (
 ) => {
   const ITEM = [];
   let items = [];
+
+  if (result === EMPTY_SALES_DETAILS) {
+    ITEM.push(
+      JSON.parse(
+        JSON.stringify(
+          new Item(
+            { WERKS, VKORG, UNAME, POSID, DATUM, UZEIT, FUNC },
+            null
+          )
+        )
+      )
+    );
+
+    return ITEM;
+  }
 
   if (!Array.isArray(result)) {
     items.push(result);

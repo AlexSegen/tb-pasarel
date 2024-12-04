@@ -1,8 +1,9 @@
+import consola from "consola";
 import Transbank from "transbank-pos-sdk";
 import { POSIntegrado as FakePOS } from "./fake-transbank-pos-sdk.js";
 import { CONFIG } from "../config.js";
 import { Log } from "./logger.js";
-import consola from "consola";
+import { EMPTY_SALES_DETAILS } from '../helpers/constants.js';
 
 let POS;
 // Pos Instance
@@ -27,18 +28,22 @@ const DICTIONARY = {
   "0500": () => POS.closeDay(), // TRANSACCIÓN DE CIERRE
   "0700": () => POS.getTotals(), // DETALLE DE VENTAS
   "0300": () => POS.changeToNormalMode(), // CAMBIO DE MODALIDAD A POS NORMAL
-  "0260": (printOnPos) => {
+  "0260": async (printOnPos) => {
     consola.info(`printOnPos: ${printOnPos}`);
     try {
       if (POS.waiting) {
         POS.waiting = false;
       }
 
-      const posResult = POS.salesDetail(printOnPos);
+      const posResult = await POS.salesDetail(printOnPos);
+      
+      if (Array.isArray(posResult) && !posResult?.length) {
+        return EMPTY_SALES_DETAILS;
+      };
 
       POS.waiting = false;
-
       return posResult;
+
     } catch (err) {
       Log(err.message, "salesDetail");
 
