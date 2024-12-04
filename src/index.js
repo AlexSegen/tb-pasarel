@@ -6,6 +6,8 @@ import { checkRequest } from "./modules/soap-client.js";
 import { downloadWSDL } from "./modules/httpclient.js";
 import { Log } from "./modules/logger.js";
 
+let keys = {};
+
 function startPOS() {
   if (CONFIG.isDev) {
     consola.info("--------- RUNNING MOCKS ---------");
@@ -19,6 +21,7 @@ function startPOS() {
         if (port === false) {
           consola.error("No se encontró ningún POS conectado");
         } else {
+          keys = await POS.loadKeys();
           consola.success("Conectado al Puerto:", port.path);
         }
       })
@@ -40,7 +43,6 @@ function startApp() {
     cron.schedule("*/5 * * * * *", async () => {
       consola.info("CRON ejecutado:", new Date().toISOString());
       if (POS.isConnected()) {
-        const keys = await POS.loadKeys();
         checkRequest(keys);
         return;
       }
