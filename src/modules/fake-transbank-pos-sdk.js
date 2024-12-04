@@ -14,7 +14,23 @@ async function getData(f) {
   }
 
 export class POSIntegrado {
-    constructor() { }
+    connected;
+    constructor() {
+        this.connected = false
+        this.ackTimeout = 2000
+        this.posTimeout = 150000
+        this.port = null
+        this.waiting = false
+
+        this.responseCallback = function () {
+        }
+        this.ackCallback = function () {
+        }
+     }
+
+    isConnected() {
+        return this.connected
+    }
 
     loadKeys() {
         return new Promise((resolve) => resolve({terminalId: 1}));
@@ -24,11 +40,8 @@ export class POSIntegrado {
         console.log(`setDebug result, debug: ${debug}`);
     }
 
-    isConnected() {
-        return true;
-    }
-
     autoconnect() {
+        this.connected = true;
         return new Promise((resolve) => resolve({
             path: "autoconnect result",
         }));
