@@ -36,12 +36,13 @@ const DICTIONARY = {
       }
 
       const posResult = await POS.salesDetail(printOnPos);
+
+      POS.waiting = false;
       
       if (Array.isArray(posResult) && !posResult?.length) {
         return EMPTY_SALES_DETAILS;
       };
 
-      POS.waiting = false;
       return posResult;
 
     } catch (err) {
